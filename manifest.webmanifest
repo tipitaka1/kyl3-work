@@ -1,6 +1,6 @@
 {
-  "name": "경율논 3장 (작업판)",
-  "short_name": "경율논3장·작",
+  "name": "경율논 3장 — 빠알리 삼장",
+  "short_name": "경율논3장",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

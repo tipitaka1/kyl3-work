@@ -303,7 +303,7 @@ html.picking article p[data-u]{cursor:pointer}
 async function getData(){
   const r = await fetch('data.bin');
   if(!r.ok) throw new Error('data.bin ' + r.status);
-  const tot = +(r.headers.get('content-length') || 13408628);
+  const tot = +(r.headers.get('content-length') || 12810515);
   const rd = r.body && r.body.getReader();
   if(!rd) return new Uint8Array(await r.arrayBuffer());
   const parts = []; let got = 0;
@@ -993,9 +993,32 @@ document.querySelectorAll('nav.tab button').forEach(b=>b.onclick=()=>{
 let defer=null;
 addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); defer=e; });
 const standalone=()=>matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+/* 카톡·네이버 같은 앱 속 브라우저 — 여기서는 홈 화면 추가가 안 된다 */
+const INAPP=(()=>{ const u=navigator.userAgent;
+  if(/KAKAOTALK/i.test(u))            return '카카오톡';
+  if(/NAVER\(inapp/i.test(u))         return '네이버';
+  if(/DaumApps|DaumDevice/i.test(u))  return '다음';
+  if(/Instagram/i.test(u))            return '인스타그램';
+  if(/FBAN|FBAV/i.test(u))            return '페이스북';
+  if(/\bLine\//i.test(u))            return '라인';
+  return '';
+})();
 function askInstall(){
   if(standalone() || S.get('noask',0)) return;
   const ios=/iP(hone|ad|od)/.test(navigator.userAgent);
+  if(INAPP){                                       // 앱 속 브라우저 — 밖으로 나가는 길을 알려 준다
+    const box=$('install');
+    box.querySelector('.it').textContent=INAPP+' 안에서 보고 계십니다';
+    box.querySelector('.id').innerHTML=
+      '여기서는 홈 화면에 넣을 수 없습니다. 밖으로 한 번만 나가면 앱처럼 쓸 수 있습니다.'
+      +'<ol><li>오른쪽 위 <b>⋮</b> (또는 <b>···</b>) 를 누르세요</li>'
+      +'<li><b>「다른 브라우저로 열기」</b> — 크롬을 고르세요</li>'
+      +'<li>크롬에서 다시 이 안내가 뜹니다. 그때 <b>홈 화면에 추가</b></li></ol>';
+    box.querySelector('#iyes').textContent='알겠습니다';
+    box.querySelector('#ino').textContent='그냥 보기';
+    setTimeout(()=>box.classList.add('show'), 1500);
+    return;
+  }
   if(!defer && !ios) return;                       // 크롬이 아직 준비가 안 됐으면 넘어간다
   const box=$('install');
   if(ios) box.querySelector('.id').innerHTML=
